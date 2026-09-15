@@ -5,6 +5,9 @@ on:
     branches: [ master, main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-ios:
     name: Compile Native Swift iOS App
@@ -48,3 +51,18 @@ jobs:
           path: ios_app/FeenixPortal.ipa
           if-no-files-found: error
           retention-days: 30
+
+      - name: Publish / Update GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/master'
+        with:
+          tag_name: ios-latest
+          name: Feenix Portal iOS App (Native Swift IPA)
+          body: |
+            ## Feenix Portal iOS App (Native Swift)
+            - **Binary**: Native Mach-O arm64 compiled via Xcode (macOS-14)
+            - **Features**: WKWebView, Cookie & Session persistence, Native pull-to-refresh, Offline fallback, Native JS alerts
+            - **Installation**: Use [Sideloadly](https://sideloadly.io/) or [AltStore](https://altstore.io/) to install on your iPhone.
+          files: ios_app/FeenixPortal.ipa
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

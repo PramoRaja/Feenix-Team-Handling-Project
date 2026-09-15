@@ -46,8 +46,7 @@ struct ContentView: View {
                             .foregroundColor(Color(red: 239/255, green: 68/255, blue: 68/255))
                         
                         Text("Connection Error")
-                            .font(.title2)
-                            .fontWeight(.bold)
+                            .font(.system(size: 22, weight: .bold))
                             .foregroundColor(.white)
                         
                         Text(errorMessage.isEmpty ? "Unable to connect to Feenix Portal. Please check your internet connection." : errorMessage)
@@ -64,7 +63,7 @@ struct ContentView: View {
                                 Image(systemName: "arrow.clockwise")
                                 Text("Retry Connection")
                             }
-                            .fontWeight(.bold)
+                            .font(.system(size: 16, weight: .bold))
                             .foregroundColor(.white)
                             .padding(.horizontal, 28)
                             .padding(.vertical, 14)
