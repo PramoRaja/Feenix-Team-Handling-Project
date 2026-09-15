@@ -1,0 +1,50 @@
+name: Build Feenix Portal iOS App (.IPA)
+
+on:
+  push:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    name: Compile Native Swift iOS App
+    runs-on: macos-14
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Select Xcode Version
+        run: sudo xcode-select -switch /Applications/Xcode_15.4.app || sudo xcode-select -switch /Applications/Xcode_15.2.app || true
+        
+      - name: Show Xcode Version
+        run: xcodebuild -version
+        
+      - name: Build FeenixPortal.app (Archive / Release)
+        run: |
+          cd ios_app
+          xcodebuild -project FeenixPortal.xcodeproj \
+            -scheme FeenixPortal \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/FeenixPortal.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            archive
+            
+      - name: Package into FeenixPortal.ipa
+        run: |
+          cd ios_app
+          mkdir -p Payload
+          cp -r build/FeenixPortal.xcarchive/Products/Applications/FeenixPortal.app Payload/
+          zip -r FeenixPortal.ipa Payload
+          ls -lh FeenixPortal.ipa
+          
+      - name: Upload FeenixPortal.ipa Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FeenixPortal-iOS-IPA
+          path: ios_app/FeenixPortal.ipa
+          if-no-files-found: error
+          retention-days: 30
