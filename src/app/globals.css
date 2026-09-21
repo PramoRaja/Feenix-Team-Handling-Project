@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
+  color-scheme: light;
 
   --bg: #f1f5f9;
 
@@ -202,7 +203,9 @@ body.light-mode {
 
 }
 
+html.dark-mode,
 body.dark-mode {
+  color-scheme: dark;
 
   --bg: #0f172a;
 
@@ -304,22 +307,84 @@ body.dark-mode {
 
 * { box-sizing: border-box; }
 
+html {
+  color-scheme: light;
+  background-color: #f1f5f9;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 116, 139, 0.3) #f1f5f9;
+}
+
+html.dark-mode {
+  color-scheme: dark;
+  background-color: #0b0f19;
+  scrollbar-color: rgba(148, 163, 184, 0.3) #0b0f19;
+}
+
 body {
-
   margin: 0; padding: 0;
-
   font-family: 'Outfit', sans-serif;
-
   background: var(--bg);
-
   color: var(--text-main);
-
   min-height: 100vh;
-
   overflow-x: hidden;
-
   transition: background-color 0.4s ease, color 0.4s ease;
+}
 
+/* ==========================================================================
+   GLOBAL CUSTOM SCROLLBAR & ARROW REMOVAL
+   ========================================================================== */
+
+/* WebKit Scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+html.dark-mode ::-webkit-scrollbar-track,
+body.dark-mode ::-webkit-scrollbar-track,
+html.dark-mode::-webkit-scrollbar-track,
+body.dark-mode::-webkit-scrollbar-track {
+  background: #0b0f19;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.3);
+  border-radius: 9999px;
+  border: 2px solid #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.5);
+}
+
+html.dark-mode ::-webkit-scrollbar-thumb,
+body.dark-mode ::-webkit-scrollbar-thumb,
+html.dark-mode::-webkit-scrollbar-thumb,
+body.dark-mode::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border: 2px solid #0b0f19;
+}
+
+html.dark-mode ::-webkit-scrollbar-thumb:hover,
+body.dark-mode ::-webkit-scrollbar-thumb:hover,
+html.dark-mode::-webkit-scrollbar-thumb:hover,
+body.dark-mode::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.6);
+}
+
+/* Eliminate native Windows/Chromium scrollbar button arrows completely */
+::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 /* Base Ambient Glows */
