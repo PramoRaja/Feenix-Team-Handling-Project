@@ -1182,6 +1182,7 @@ function WorkerDashboard({ router }) {
     // Track selected status and leader per task
     const [taskState, setTaskState] = useState({}); // { [taskId]: { status, leader_id } }
     const [selectedTask, setSelectedTask] = useState(null);
+    const [selectedKanbanCol, setSelectedKanbanCol] = useState('urgent');
     
     const { theme } = useTheme();
     const isLight = theme === 'light';
@@ -1502,20 +1503,22 @@ function WorkerDashboard({ router }) {
                          </div>
                      </div>
 
-                     {/* Vertical divider */}
-                     <div className="worker-hero-divider" style={{ width: '1px', height: '42px', background: isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)', margin: '0 6px' }} />
-
-                     {/* Points block */}
-                     <div className="worker-hero-points" style={{ display: 'flex', alignItems: 'center', gap: '12px', background: isLight ? 'rgba(16,185,129,0.05)' : 'rgba(16,185,129,0.08)', borderRadius: '12px', padding: '10px 16px', border: '1px solid rgba(16,185,129,0.15)' }}>
-                         <div style={{ width:'36px', height:'36px', borderRadius:'10px', background:'linear-gradient(135deg, #10b981, #3b82f6)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.1em' }}>🏆</div>
-                         <div>
-                             <p style={{ margin:0, fontSize:'0.65em', color:'#10b981', textTransform:'uppercase', letterSpacing:'1px', fontWeight:700 }}>My Points</p>
-                             <h2 style={{ margin:'2px 0 0 0', fontSize:'1.4em', color: isLight ? '#059669' : '#10b981', fontWeight:800, lineHeight:1 }}>
-                                 {myPoints !== null ? Number(myPoints).toFixed(1) : '—'}
-                                 <span style={{ fontSize:'0.45em', color:'#6ee7b7', marginLeft:'4px', fontWeight:500 }}>PTS</span>
-                             </h2>
-                         </div>
-                     </div>
+                     {/* Points block (only for workers with points) */}
+                     {!isAuthorizedAssign && myPoints !== null && myPoints > 0 && (
+                         <>
+                             <div className="worker-hero-divider" style={{ width: '1px', height: '42px', background: isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)', margin: '0 6px' }} />
+                             <div className="worker-hero-points" style={{ display: 'flex', alignItems: 'center', gap: '12px', background: isLight ? 'rgba(16,185,129,0.05)' : 'rgba(16,185,129,0.08)', borderRadius: '12px', padding: '10px 16px', border: '1px solid rgba(16,185,129,0.15)' }}>
+                                 <div style={{ width:'36px', height:'36px', borderRadius:'10px', background:'linear-gradient(135deg, #10b981, #3b82f6)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.1em' }}>🏆</div>
+                                 <div>
+                                     <p style={{ margin:0, fontSize:'0.65em', color:'#10b981', textTransform:'uppercase', letterSpacing:'1px', fontWeight:700 }}>My Points</p>
+                                     <h2 style={{ margin:'2px 0 0 0', fontSize:'1.4em', color: isLight ? '#059669' : '#10b981', fontWeight:800, lineHeight:1 }}>
+                                         {Number(myPoints).toFixed(1)}
+                                         <span style={{ fontSize:'0.45em', color:'#6ee7b7', marginLeft:'4px', fontWeight:500 }}>PTS</span>
+                                     </h2>
+                                 </div>
+                             </div>
+                         </>
+                     )}
                  </div>
              </div>
 
@@ -1810,187 +1813,223 @@ function WorkerDashboard({ router }) {
                  const todayLocal = new Date();
                  const todayLocalStr = new Date(todayLocal.getTime() - (todayLocal.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
 
-                 return (
-                     <div style={{ display:'flex', flexDirection:'column', gap:'16px' }}>
-                         {/* Review requests strip */}
-                         {reviewTasks && reviewTasks.length > 0 && (
-                             <div className="glass-panel" style={{ padding:'16px 22px', border:'1px solid rgba(139,92,246,0.3)', background:'rgba(139,92,246,0.04)', display:'flex', alignItems:'center', gap:'12px', flexWrap:'wrap' }}>
-                                 <span>🔔</span>
-                                 <strong style={{ color:'#a855f7', fontSize:'0.92em' }}>Approval Requests ({reviewTasks.length})</strong>
-                                 <span style={{ color:'var(--text-muted)', fontSize:'0.82em' }}>— {reviewTasks.map(t => t.worker_name).join(', ')}</span>
-                                 <div style={{ marginLeft:'auto', display:'flex', gap:'8px', flexWrap:'wrap' }}>
-                                     {reviewTasks.slice(0,2).map(t => (
-                                         <div key={t.id} style={{ display:'flex', gap:'6px', alignItems:'center', background: isLight ? '#f8fafc' : 'rgba(0,0,0,0.2)', padding:'6px 12px', borderRadius:'10px', border:'1px solid rgba(139,92,246,0.2)' }}>
-                                             <span style={{ fontSize:'0.82em', fontWeight:600, color: isLight ? '#1e293b' : '#e2e8f0' }}>{t.title}</span>
-                                             <form onSubmit={e => updateStatus(t.id, e)} style={{ display:'flex', gap:'4px', margin:0 }}>
-                                                 <input name="note" type="hidden" value="" readOnly />
-                                                 <button type="submit" name="status" value="Having Changes" style={{ padding:'3px 8px', fontSize:'0.72em', borderRadius:'6px', border:'1px solid rgba(249,115,22,0.4)', background:'rgba(249,115,22,0.08)', color:'#ea580c', cursor:'pointer' }}>↩ Changes</button>
-                                                 <button type="submit" name="status" value="Approved" style={{ padding:'3px 8px', fontSize:'0.72em', borderRadius:'6px', border:'none', background:'#0ea5e9', color:'#fff', cursor:'pointer' }}>✓ Approve</button>
-                                             </form>
-                                         </div>
-                                     ))}
-                                 </div>
-                             </div>
-                         )}
+                  const renderKanbanCard = (t, col) => {
+                      const dueDate = processDateLocal(t.due_date);
+                      const isOverdue = dueDate && dueDate < todayLocalStr && t.status !== 'Completed' && t.status !== 'Approved';
+                      const isDueToday = dueDate === todayLocalStr;
+                      const isDone = t.status === 'Completed' || t.status === 'Approved';
+                      return (
+                           <div key={t.id} onClick={() => setSelectedTask(t)}
+                               style={{
+                                   padding:'14px',
+                                   borderRadius:'14px',
+                                   background: isLight ? '#ffffff' : 'rgba(255,255,255,0.04)',
+                                   border: t.is_urgent 
+                                       ? '1px solid rgba(239,68,68,0.5)' 
+                                       : (isOverdue ? '1px solid rgba(239,68,68,0.4)' : `1px solid ${isLight ? '#e2e8f0' : 'rgba(255,255,255,0.07)'}`),
+                                   boxShadow: t.is_urgent
+                                       ? (isLight ? '0 2px 10px rgba(239,68,68,0.1)' : '0 0 14px rgba(239,68,68,0.2)')
+                                       : (isLight ? '0 1px 6px rgba(0,0,0,0.05)' : 'none'),
+                                   transition:'box-shadow 0.2s, transform 0.2s, border-color 0.2s',
+                                   opacity: isDone ? 0.75 : 1,
+                                   cursor: 'pointer',
+                                   width: '100%',
+                                   boxSizing: 'border-box'
+                               }}
+                               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                               onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
+                           >
+                               <div style={{ marginBottom:'8px' }}>
+                                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '4px' }}>
+                                       <div style={{ fontWeight:700, fontSize:'0.92em', color: isLight ? '#1e293b' : '#e2e8f0', textDecoration: isDone ? 'line-through' : 'none', lineHeight: 1.35, wordBreak: 'break-word' }}>{t.title}</div>
+                                       {t.is_urgent && (
+                                           <span style={{
+                                               fontSize: '0.65em',
+                                               fontWeight: 800,
+                                               color: '#ef4444',
+                                               background: 'rgba(239,68,68,0.12)',
+                                               border: '1px solid rgba(239,68,68,0.3)',
+                                               padding: '3px 7px',
+                                               borderRadius: '6px',
+                                               textTransform: 'uppercase',
+                                               letterSpacing: '0.5px',
+                                               display: 'inline-flex',
+                                               alignItems: 'center',
+                                               gap: '3px',
+                                               flexShrink: 0
+                                           }}>
+                                               🚨 Urgent
+                                           </span>
+                                       )}
+                                   </div>
+                                   {t.description && <div style={{ fontSize:'0.76em', color:'var(--text-muted)', overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', marginBottom:'6px', wordBreak: 'break-word', lineHeight: 1.4 }}>{t.description}</div>}
+                                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.74em', color: 'var(--text-muted)', marginTop: '6px', flexWrap: 'wrap' }}>
+                                       <span style={{ fontWeight: 600 }}>Agent:</span>
+                                       <span style={{
+                                           padding: '2px 8px',
+                                           borderRadius: '6px',
+                                           background: t.assigned_by_ai ? 'rgba(139,92,246,0.1)' : (isLight ? '#f1f5f9' : 'rgba(255,255,255,0.06)'),
+                                           color: t.assigned_by_ai ? '#8b5cf6' : (isLight ? '#475569' : '#cbd5e1'),
+                                           fontWeight: 600,
+                                           display: 'inline-flex',
+                                           alignItems: 'center',
+                                           gap: '4px',
+                                           maxWidth: '100%',
+                                           overflow: 'hidden',
+                                           textOverflow: 'ellipsis',
+                                           whiteSpace: 'nowrap'
+                                       }}>
+                                           {t.assigned_by_ai ? '🤖 AI Agent' : `👤 ${t.assigner_name || 'Admin'}`}
+                                       </span>
+                                   </div>
+                               </div>
+                               {dueDate && (
+                                   <div style={{ fontSize:'0.72em', fontWeight:600, padding:'3px 8px', borderRadius:'6px', display:'inline-flex', alignItems:'center', gap:'4px', marginBottom:'10px', background: isOverdue ? 'rgba(239,68,68,0.1)' : isDueToday ? 'rgba(245,158,11,0.1)' : (isLight ? '#f1f5f9' : 'rgba(255,255,255,0.06)'), color: isOverdue ? '#dc2626' : isDueToday ? '#d97706' : 'var(--text-muted)' }}>
+                                       {isOverdue ? '⚠️ Overdue' : isDueToday ? '🔴 Today' : `📅 ${new Date(dueDate + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric'})}`}
+                                   </div>
+                               )}
+                               {!isDone ? (
+                                   <select value={taskState[t.id]?.status || t.status} onClick={e => e.stopPropagation()} onChange={e => handleKanbanStatus(t.id, e.target.value)}
+                                       style={{ width:'100%', padding:'7px 10px', fontSize:'0.8em', borderRadius:'8px', border:`1px solid ${col.border}`, background: isLight ? '#f8fafc' : 'rgba(0,0,0,0.3)', color: col.color, fontWeight:600, cursor:'pointer', outline:'none' }}>
+                                       <option value="Assigned">📌 Assigned</option>
+                                       <option value="In Progress">⚡ In Progress</option>
+                                       <option value="Change Making">🛠️ Change Making</option>
+                                       <option value="Pending Approval">🔔 Send for Approval</option>
+                                       <option value="Completed">✅ Completed</option>
+                                   </select>
+                               ) : (
+                                   <div style={{ fontSize:'0.76em', fontWeight:600, color: t.status === 'Approved' ? '#0284c7' : '#059669' }}>
+                                       {t.status === 'Approved' ? '✓ Approved' : '✓ Completed'}
+                                   </div>
+                               )}
+                           </div>
+                      );
+                  };
 
+                  return (
+                      <div style={{ display:'flex', flexDirection:'column', gap:'16px', width: '100%' }}>
+                          {/* Review requests strip */}
+                          {reviewTasks && reviewTasks.length > 0 && (
+                              <div className="glass-panel" style={{ padding:'16px 22px', border:'1px solid rgba(139,92,246,0.3)', background:'rgba(139,92,246,0.04)', display:'flex', alignItems:'center', gap:'12px', flexWrap:'wrap' }}>
+                                  <span>🔔</span>
+                                  <strong style={{ color:'#a855f7', fontSize:'0.92em' }}>Approval Requests ({reviewTasks.length})</strong>
+                                  <span style={{ color:'var(--text-muted)', fontSize:'0.82em' }}>— {reviewTasks.map(t => t.worker_name).join(', ')}</span>
+                                  <div style={{ marginLeft:'auto', display:'flex', gap:'8px', flexWrap:'wrap' }}>
+                                      {reviewTasks.slice(0,2).map(t => (
+                                          <div key={t.id} style={{ display:'flex', gap:'6px', alignItems:'center', background: isLight ? '#f8fafc' : 'rgba(0,0,0,0.2)', padding:'6px 12px', borderRadius:'10px', border:'1px solid rgba(139,92,246,0.2)' }}>
+                                              <span style={{ fontSize:'0.82em', fontWeight:600, color: isLight ? '#1e293b' : '#e2e8f0' }}>{t.title}</span>
+                                              <form onSubmit={e => updateStatus(t.id, e)} style={{ display:'flex', gap:'4px', margin:0 }}>
+                                                  <input name="note" type="hidden" value="" readOnly />
+                                                  <button type="submit" name="status" value="Having Changes" style={{ padding:'3px 8px', fontSize:'0.72em', borderRadius:'6px', border:'1px solid rgba(249,115,22,0.4)', background:'rgba(249,115,22,0.08)', color:'#ea580c', cursor:'pointer' }}>↩ Changes</button>
+                                                  <button type="submit" name="status" value="Approved" style={{ padding:'3px 8px', fontSize:'0.72em', borderRadius:'6px', border:'none', background:'#0ea5e9', color:'#fff', cursor:'pointer' }}>✓ Approve</button>
+                                              </form>
+                                          </div>
+                                      ))}
+                                  </div>
+                              </div>
+                          )}
 
-                          {/* Mobile Quick Column Jump Navigation */}
-                          <div className="worker-kanban-mobile-nav">
-                              {columns.map(col => {
-                                  const colTasks = getColTasks(col.id);
-                                  return (
-                                      <button
-                                          key={col.id}
-                                          type="button"
-                                          onClick={() => {
-                                              const el = document.getElementById(`worker-col-${col.id}`);
-                                              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
-                                          }}
-                                          className="worker-kanban-nav-pill"
-                                          style={{
-                                              background: col.bg,
-                                              border: `1px solid ${col.border}`,
-                                              color: col.color
-                                          }}
-                                      >
-                                          <span>{col.emoji} {col.label}</span>
-                                          <span style={{
-                                              minWidth: '20px',
-                                              height: '20px',
-                                              borderRadius: '10px',
-                                              background: col.color,
-                                              color: '#fff',
-                                              fontSize: '0.85em',
-                                              fontWeight: 800,
-                                              display: 'inline-flex',
-                                              alignItems: 'center',
-                                              justifyContent: 'center',
-                                              padding: '0 6px'
-                                          }}>
-                                              {colTasks.length}
-                                          </span>
-                                      </button>
-                                  );
-                              })}
+                          {/* Desktop Kanban Board (>= 769px) */}
+                          <div className="worker-kanban-desktop">
+                              <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'14px', alignItems:'start' }}>
+                                  {columns.map(col => {
+                                      const colTasks = getColTasks(col.id);
+                                      return (
+                                          <div key={col.id} className="worker-kanban-col">
+                                              <div style={{ display:'flex', alignItems:'center', gap:'8px', padding:'10px 14px', borderRadius:'12px', background: col.bg, border:`1px solid ${col.border}` }}>
+                                                  <span>{col.emoji}</span>
+                                                  <span style={{ fontWeight:700, fontSize:'0.86em', color: col.color }}>{col.label}</span>
+                                                  <span style={{ marginLeft:'auto', minWidth:'22px', height:'22px', borderRadius:'50%', background: col.color, color:'#fff', fontSize:'0.72em', fontWeight:800, display:'flex', alignItems:'center', justifyContent:'center' }}>{colTasks.length}</span>
+                                              </div>
+
+                                              <div style={{ display:'flex', flexDirection:'column', gap:'8px', minHeight:'60px' }}>
+                                                  {colTasks.length === 0 && (
+                                                      <div style={{ padding:'20px 14px', textAlign:'center', color:'var(--text-muted)', fontSize:'0.8em', borderRadius:'12px', border:`1px dashed ${col.border}`, background: isLight ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.02)' }}>No tasks</div>
+                                                  )}
+                                                  {colTasks.map(t => renderKanbanCard(t, col))}
+                                              </div>
+                                          </div>
+                                      );
+                                  })}
+                              </div>
                           </div>
 
-                          {/* Kanban columns */}
-                          <div className="worker-kanban-board">
-                              {columns.map(col => {
-                                  const colTasks = getColTasks(col.id);
-                                  return (
-                                      <div key={col.id} id={`worker-col-${col.id}`} className="worker-kanban-col">
-                                          <div style={{ display:'flex', alignItems:'center', gap:'8px', padding:'10px 14px', borderRadius:'12px', background: col.bg, border:`1px solid ${col.border}` }}>
-                                              <span>{col.emoji}</span>
-                                              <span style={{ fontWeight:700, fontSize:'0.86em', color: col.color }}>{col.label}</span>
-                                              <span style={{ marginLeft:'auto', minWidth:'22px', height:'22px', borderRadius:'50%', background: col.color, color:'#fff', fontSize:'0.72em', fontWeight:800, display:'flex', alignItems:'center', justifyContent:'center' }}>{colTasks.length}</span>
-                                          </div>
+                          {/* Mobile App Kanban View (<= 768px) */}
+                          <div className="worker-kanban-mobile">
+                              {/* Segmented Column Switcher Tabs */}
+                              <div className="worker-kanban-mobile-tabs">
+                                  {columns.map(col => {
+                                      const colTasks = getColTasks(col.id);
+                                      const isActive = (selectedKanbanCol || 'urgent') === col.id;
+                                      return (
+                                          <button
+                                              key={col.id}
+                                              type="button"
+                                              onClick={() => setSelectedKanbanCol(col.id)}
+                                              className={`worker-kanban-tab-btn ${isActive ? 'active' : ''}`}
+                                              style={{
+                                                  background: isActive ? col.bg : (isLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)'),
+                                                  border: `1.5px solid ${isActive ? col.color : (isLight ? '#cbd5e1' : 'rgba(255,255,255,0.08)')}`,
+                                                  color: isActive ? col.color : 'var(--text-muted)',
+                                                  boxShadow: isActive ? `0 2px 10px ${col.border}` : 'none',
+                                              }}
+                                          >
+                                              <span style={{ fontSize: '1.05em' }}>{col.emoji}</span>
+                                              <span style={{ fontWeight: 700 }}>{col.label}</span>
+                                              <span style={{
+                                                  minWidth: '20px',
+                                                  height: '20px',
+                                                  borderRadius: '10px',
+                                                  background: isActive ? col.color : (isLight ? '#94a3b8' : 'rgba(255,255,255,0.2)'),
+                                                  color: '#fff',
+                                                  fontSize: '0.75em',
+                                                  fontWeight: 800,
+                                                  display: 'inline-flex',
+                                                  alignItems: 'center',
+                                                  justifyContent: 'center',
+                                                  padding: '0 5px'
+                                              }}>
+                                                  {colTasks.length}
+                                              </span>
+                                          </button>
+                                      );
+                                  })}
+                              </div>
 
-                                          <div style={{ display:'flex', flexDirection:'column', gap:'8px', minHeight:'60px' }}>
-                                              {colTasks.length === 0 && (
-                                                  <div style={{ padding:'20px 14px', textAlign:'center', color:'var(--text-muted)', fontSize:'0.8em', borderRadius:'12px', border:`1px dashed ${col.border}`, background: isLight ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.02)' }}>No tasks</div>
-                                              )}
-                                              {colTasks.map(t => {
-                                                  const dueDate = processDateLocal(t.due_date);
-                                                  const isOverdue = dueDate && dueDate < todayLocalStr && t.status !== 'Completed' && t.status !== 'Approved';
-                                                  const isDueToday = dueDate === todayLocalStr;
-                                                  const isDone = t.status === 'Completed' || t.status === 'Approved';
-                                                  return (
-                                                       <div key={t.id} onClick={() => setSelectedTask(t)}
-                                                           style={{
-                                                               padding:'14px',
-                                                               borderRadius:'12px',
-                                                               background: isLight ? '#ffffff' : 'rgba(255,255,255,0.04)',
-                                                               border: t.is_urgent 
-                                                                   ? '1px solid rgba(239,68,68,0.5)' 
-                                                                   : (isOverdue ? '1px solid rgba(239,68,68,0.4)' : `1px solid ${isLight ? '#e2e8f0' : 'rgba(255,255,255,0.07)'}`),
-                                                               boxShadow: t.is_urgent
-                                                                   ? (isLight ? '0 1px 8px rgba(239,68,68,0.08)' : '0 0 12px rgba(239,68,68,0.15)')
-                                                                   : (isLight ? '0 1px 6px rgba(0,0,0,0.05)' : 'none'),
-                                                               transition:'box-shadow 0.2s, transform 0.2s, border-color 0.2s',
-                                                               opacity: isDone ? 0.75 : 1, cursor: 'pointer'
-                                                           }}
-                                                           onMouseEnter={e => { e.currentTarget.style.boxShadow = t.is_urgent ? (isLight ? '0 4px 16px rgba(239,68,68,0.2)' : '0 0 16px rgba(239,68,68,0.3)') : (isLight ? '0 4px 16px rgba(0,0,0,0.1)' : '0 4px 16px rgba(0,0,0,0.3)'); e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                                                           onMouseLeave={e => { e.currentTarget.style.boxShadow = t.is_urgent ? (isLight ? '0 1px 8px rgba(239,68,68,0.08)' : '0 0 12px rgba(239,68,68,0.15)') : (isLight ? '0 1px 6px rgba(0,0,0,0.05)' : 'none'); e.currentTarget.style.transform = 'translateY(0)'; }}
-                                                       >
-                                                           <div style={{ marginBottom:'8px' }}>
-                                                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '4px' }}>
-                                                                   <div style={{ fontWeight:700, fontSize:'0.88em', color: isLight ? '#1e293b' : '#e2e8f0', textDecoration: isDone ? 'line-through' : 'none', lineHeight: 1.3, wordBreak: 'break-word' }}>{t.title}</div>
-                                                                   {t.is_urgent && (
-                                                                       <span style={{
-                                                                           fontSize: '0.65em',
-                                                                           fontWeight: 800,
-                                                                           color: '#ef4444',
-                                                                           background: 'rgba(239,68,68,0.12)',
-                                                                           border: '1px solid rgba(239,68,68,0.3)',
-                                                                           padding: '2px 6px',
-                                                                           borderRadius: '6px',
-                                                                           textTransform: 'uppercase',
-                                                                           letterSpacing: '0.5px',
-                                                                           display: 'inline-flex',
-                                                                           alignItems: 'center',
-                                                                           gap: '3px',
-                                                                           flexShrink: 0
-                                                                       }}>
-                                                                           🚨 Urgent
-                                                                       </span>
-                                                                   )}
-                                                               </div>
-                                                               {t.description && <div style={{ fontSize:'0.74em', color:'var(--text-muted)', overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', marginBottom:'6px', wordBreak: 'break-word' }}>{t.description}</div>}
-                                                               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.74em', color: 'var(--text-muted)', marginTop: '6px', flexWrap: 'wrap' }}>
-                                                                   <span style={{ fontWeight: 600 }}>Agent:</span>
-                                                                   <span style={{
-                                                                       padding: '2px 6px',
-                                                                       borderRadius: '6px',
-                                                                       background: t.assigned_by_ai ? 'rgba(139,92,246,0.1)' : (isLight ? '#f1f5f9' : 'rgba(255,255,255,0.06)'),
-                                                                       color: t.assigned_by_ai ? '#8b5cf6' : (isLight ? '#475569' : '#cbd5e1'),
-                                                                       fontWeight: 600,
-                                                                       display: 'inline-flex',
-                                                                       alignItems: 'center',
-                                                                       gap: '4px',
-                                                                       maxWidth: '100%',
-                                                                       overflow: 'hidden',
-                                                                       textOverflow: 'ellipsis',
-                                                                       whiteSpace: 'nowrap'
-                                                                   }}>
-                                                                       {t.assigned_by_ai ? '🤖 AI Agent' : `👤 ${t.assigner_name || 'Admin'}`}
-                                                                   </span>
-                                                               </div>
-                                                           </div>
-                                                           {dueDate && (
-                                                               <div style={{ fontSize:'0.7em', fontWeight:600, padding:'2px 7px', borderRadius:'6px', display:'inline-flex', alignItems:'center', gap:'3px', marginBottom:'8px', background: isOverdue ? 'rgba(239,68,68,0.1)' : isDueToday ? 'rgba(245,158,11,0.1)' : (isLight ? '#f1f5f9' : 'rgba(255,255,255,0.06)'), color: isOverdue ? '#dc2626' : isDueToday ? '#d97706' : 'var(--text-muted)' }}>
-                                                                   {isOverdue ? '⚠️ Overdue' : isDueToday ? '🔴 Today' : `📅 ${new Date(dueDate + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric'})}`}
-                                                               </div>
-                                                           )}
-                                                           {!isDone ? (
-                                                               <select value={taskState[t.id]?.status || t.status} onClick={e => e.stopPropagation()} onChange={e => handleKanbanStatus(t.id, e.target.value)}
-                                                                   style={{ width:'100%', padding:'6px 10px', fontSize:'0.76em', borderRadius:'8px', border:`1px solid ${col.border}`, background: isLight ? '#f8fafc' : 'rgba(0,0,0,0.3)', color: col.color, fontWeight:600, cursor:'pointer', outline:'none' }}>
-                                                                   <option value="Assigned">📌 Assigned</option>
-                                                                   <option value="In Progress">⚡ In Progress</option>
-                                                                    <option value="Change Making">🛠️ Change Making</option>
-                                                                   <option value="Pending Approval">🔔 Send for Approval</option>
-                                                                   <option value="Completed">✅ Completed</option>
-                                                               </select>
-                                                           ) : (
-                                                               <div style={{ fontSize:'0.74em', fontWeight:600, color: t.status === 'Approved' ? '#0284c7' : '#059669' }}>
-                                                                   {t.status === 'Approved' ? '✓ Approved' : '✓ Completed'}
-                                                               </div>
-                                                           )}
-                                                       </div>
-                                                  );
-                                              })}
-                                          </div>
+                              {/* Selected Column Task Cards (Full Width, 100% Native App Feel) */}
+                              {(() => {
+                                  const activeColObj = columns.find(c => c.id === (selectedKanbanCol || 'urgent')) || columns[0];
+                                  const activeColTasks = getColTasks(activeColObj.id);
+                                  return (
+                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
+                                          {activeColTasks.length === 0 ? (
+                                              <div style={{
+                                                  padding: '36px 20px',
+                                                  textAlign: 'center',
+                                                  color: 'var(--text-muted)',
+                                                  fontSize: '0.88em',
+                                                  borderRadius: '16px',
+                                                  border: `1.5px dashed ${activeColObj.border}`,
+                                                  background: isLight ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.02)'
+                                              }}>
+                                                  <div style={{ fontSize: '1.8em', marginBottom: '8px' }}>{activeColObj.emoji}</div>
+                                                  <div>No operations currently in <strong>{activeColObj.label}</strong></div>
+                                              </div>
+                                          ) : (
+                                              activeColTasks.map(t => renderKanbanCard(t, activeColObj))
+                                          )}
                                       </div>
                                   );
-                              })}
+                              })()}
                           </div>
+
                           {tasks.length === 0 && (
-                             <div className="glass-panel" style={{ padding:'50px', textAlign:'center' }}>
-                                 <p style={{ color:'var(--text-muted)', fontSize:'1.1em' }}>No operations currently assigned.</p>
-                             </div>
-                         )}
-                     </div>
-                 );
+                              <div className="glass-panel" style={{ padding:'50px', textAlign:'center' }}>
+                                  <p style={{ color:'var(--text-muted)', fontSize:'1.1em' }}>No operations currently assigned.</p>
+                              </div>
+                          )}
+                      </div>
+                  );
              })()}
 
              {/* ── OPERATIONS FLOW TAB ── */}

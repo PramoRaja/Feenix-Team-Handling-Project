@@ -1246,4 +1246,58 @@ body.dark-mode .network-scroll-container::-webkit-scrollbar-track {
   }
 }
 
+/* ── Worker Kanban Native App Switcher Styles ── */
+.worker-kanban-desktop {
+  display: block;
+  width: 100%;
+}
+
+.worker-kanban-mobile {
+  display: none;
+  width: 100%;
+}
+
+.worker-kanban-mobile-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  width: 100%;
+}
+.worker-kanban-mobile-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.worker-kanban-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 14px;
+  font-size: 0.86em;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 860px) {
+  .worker-kanban-desktop {
+    display: none !important;
+  }
+
+  .worker-kanban-mobile {
+    display: flex !important;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+}
+
+
 
