@@ -603,7 +603,7 @@ function AdminDashboard({ router, user }) {
             }}>
                 <div>
                     <h1 style={{ margin: 0, fontSize: '1.8em', fontWeight: 800, color: 'var(--text-main)' }}>
-                        {getGreeting()}, <span style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{adminName}</span> 👋
+                        {getGreeting()}, <span style={{ color: isLight ? '#2563eb' : '#60a5fa', fontWeight: 800 }}>{adminName}</span> 👋
                     </h1>
                     <p style={{ margin: '6px 0 0 0', color: 'var(--text-muted)', fontSize: '0.92em', fontWeight: 500 }}>
                         {todayQuote}

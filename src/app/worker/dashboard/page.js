@@ -1430,9 +1430,9 @@ function WorkerDashboard({ router }) {
                      <p style={{ margin:'0 0 4px 0', fontSize:'0.85em', color:'#7c3aed', textTransform:'uppercase', letterSpacing:'2px', fontWeight:600 }}>
                          {new Date().toLocaleDateString('en-US', { weekday:'long', day:'numeric', month:'long' })}
                      </p>
-                     <h1 style={{ margin:'0 0 8px 0', fontSize:'2em', fontWeight:800, background: isLight ? 'linear-gradient(to right, #1e293b, #6d28d9)' : 'linear-gradient(to right, #e2e8f0, #a78bfa)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', lineHeight:1.2 }}>
-                         {getGreeting()}, {workerName}! 👋
-                     </h1>
+                      <h1 style={{ margin:'0 0 8px 0', fontSize:'1.85em', fontWeight:800, color: 'var(--text-main)', lineHeight:1.2 }}>
+                          {getGreeting()}, <span style={{ color: isLight ? '#7c3aed' : '#a78bfa', fontWeight:800 }}>{workerName}</span>! 👋
+                      </h1>
                      <p style={{ margin:0, fontSize:'1.05em', color: isLight ? '#475569' : '#94a3b8', fontStyle:'italic', fontWeight:400 }}>
                          {todayQuote}
                      </p>
