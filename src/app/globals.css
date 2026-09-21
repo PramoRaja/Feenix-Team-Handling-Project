@@ -1128,3 +1128,122 @@ body.dark-mode .network-scroll-container::-webkit-scrollbar-track {
   }
 }
 
+/* ==========================================================================
+   WORKER DASHBOARD & KANBAN BOARD RESPONSIVE ENGINE
+   ========================================================================== */
+
+.worker-hero-stats-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  flex-wrap: wrap;
+}
+
+.worker-tabs-bar {
+  display: flex;
+  gap: 8px;
+  padding: 6px;
+  border-radius: 14px;
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.worker-tabs-bar::-webkit-scrollbar {
+  display: none;
+}
+.worker-tabs-bar button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.worker-kanban-mobile-nav {
+  display: none;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 6px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.worker-kanban-mobile-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.worker-kanban-nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 0.82em;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.worker-kanban-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  align-items: start;
+  width: 100%;
+}
+
+.worker-kanban-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .worker-tabs-bar {
+    width: 100%;
+  }
+
+  .worker-kanban-mobile-nav {
+    display: flex;
+  }
+
+  .worker-kanban-board {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: visible;
+    gap: 14px;
+    padding-bottom: 16px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    scrollbar-width: thin;
+  }
+
+  .worker-kanban-col {
+    flex: 0 0 min(290px, 85vw);
+    min-width: min(280px, 85vw);
+    max-width: 320px;
+    scroll-snap-align: start;
+  }
+
+  .worker-hero-stats-row {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .worker-hero-divider {
+    display: none;
+  }
+
+  .worker-hero-points {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+

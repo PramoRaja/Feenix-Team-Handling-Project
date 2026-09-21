@@ -1406,7 +1406,7 @@ function WorkerDashboard({ router }) {
         <div className="tasks-grid animate-slide-up">
 
              {/* Greeting + Points Banner (merged) */}
-             <div style={{
+             <div className="dashboard-hero-banner" style={{
                  padding: '30px 35px',
                  marginBottom: '20px',
                  borderRadius: '20px',
@@ -1420,13 +1420,13 @@ function WorkerDashboard({ router }) {
                  justifyContent: 'space-between',
                  alignItems: 'center',
                  flexWrap: 'wrap',
-                 gap: '24px',
+                 gap: '20px',
              }}>
                  <div style={{ position:'absolute', top:'-30px', right:'-30px', width:'140px', height:'140px', borderRadius:'50%', background:'rgba(139,92,246,0.07)', pointerEvents:'none' }} />
                  <div style={{ position:'absolute', bottom:'-20px', left:'40%', width:'100px', height:'100px', borderRadius:'50%', background:'rgba(59,130,246,0.06)', pointerEvents:'none' }} />
                  
                  {/* Left: Greeting */}
-                 <div style={{ position:'relative', zIndex:1 }}>
+                 <div className="dashboard-hero-greeting" style={{ position:'relative', zIndex:1 }}>
                      <p style={{ margin:'0 0 4px 0', fontSize:'0.85em', color:'#7c3aed', textTransform:'uppercase', letterSpacing:'2px', fontWeight:600 }}>
                          {new Date().toLocaleDateString('en-US', { weekday:'long', day:'numeric', month:'long' })}
                      </p>
@@ -1439,72 +1439,74 @@ function WorkerDashboard({ router }) {
                  </div>
 
                  {/* Right: Stats & Points */}
-                 <div style={{ display: 'flex', gap: '20px', alignItems: 'center', position: 'relative', zIndex: 1, flexWrap: 'wrap' }}>
-                     {/* Today Works Stat */}
-                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', minWidth: '80px' }}>
-                         <div style={{
-                             width: '42px',
-                             height: '42px',
-                             borderRadius: '12px',
-                             background: isLight ? 'rgba(59,130,246,0.07)' : 'rgba(59,130,246,0.12)',
-                             display: 'flex',
-                             alignItems: 'center',
-                             justifyContent: 'center',
-                             fontSize: '1.1em',
-                             marginBottom: '4px',
-                             border: isLight ? '1px solid rgba(59,130,246,0.15)' : '1px solid rgba(59,130,246,0.25)'
-                         }}>
-                             📅
+                 <div className="worker-hero-stats-row">
+                     <div style={{ display: 'flex', gap: '14px', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
+                         {/* Today Works Stat */}
+                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', minWidth: '70px' }}>
+                             <div style={{
+                                 width: '42px',
+                                 height: '42px',
+                                 borderRadius: '12px',
+                                 background: isLight ? 'rgba(59,130,246,0.07)' : 'rgba(59,130,246,0.12)',
+                                 display: 'flex',
+                                 alignItems: 'center',
+                                 justifyContent: 'center',
+                                 fontSize: '1.1em',
+                                 marginBottom: '4px',
+                                 border: isLight ? '1px solid rgba(59,130,246,0.15)' : '1px solid rgba(59,130,246,0.25)'
+                             }}>
+                                 📅
+                             </div>
+                             <div style={{ fontSize: '1.15em', fontWeight: 800, color: isLight ? '#1e293b' : '#e2e8f0', lineHeight: 1.1 }}>{todayWorksCount}</div>
+                             <div style={{ fontSize: '0.68em', color: isLight ? '#64748b' : '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '2px' }}>Today Works</div>
                          </div>
-                         <div style={{ fontSize: '1.15em', fontWeight: 800, color: isLight ? '#1e293b' : '#e2e8f0', lineHeight: 1.1 }}>{todayWorksCount}</div>
-                         <div style={{ fontSize: '0.68em', color: isLight ? '#64748b' : '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '2px' }}>Today Works</div>
-                     </div>
 
-                     {/* Agent Works Stat */}
-                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', minWidth: '80px' }}>
-                         <div style={{
-                             width: '42px',
-                             height: '42px',
-                             borderRadius: '12px',
-                             background: isLight ? 'rgba(139,92,246,0.07)' : 'rgba(139,92,246,0.12)',
-                             display: 'flex',
-                             alignItems: 'center',
-                             justifyContent: 'center',
-                             fontSize: '1.1em',
-                             marginBottom: '4px',
-                             border: isLight ? '1px solid rgba(139,92,246,0.15)' : '1px solid rgba(139,92,246,0.25)'
-                         }}>
-                             🤖
+                         {/* Agent Works Stat */}
+                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', minWidth: '70px' }}>
+                             <div style={{
+                                 width: '42px',
+                                 height: '42px',
+                                 borderRadius: '12px',
+                                 background: isLight ? 'rgba(139,92,246,0.07)' : 'rgba(139,92,246,0.12)',
+                                 display: 'flex',
+                                 alignItems: 'center',
+                                 justifyContent: 'center',
+                                 fontSize: '1.1em',
+                                 marginBottom: '4px',
+                                 border: isLight ? '1px solid rgba(139,92,246,0.15)' : '1px solid rgba(139,92,246,0.25)'
+                             }}>
+                                 🤖
+                             </div>
+                             <div style={{ fontSize: '1.15em', fontWeight: 800, color: isLight ? '#1e293b' : '#e2e8f0', lineHeight: 1.1 }}>{agentWorksCount}</div>
+                             <div style={{ fontSize: '0.68em', color: isLight ? '#64748b' : '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '2px' }}>Agent Works</div>
                          </div>
-                         <div style={{ fontSize: '1.15em', fontWeight: 800, color: isLight ? '#1e293b' : '#e2e8f0', lineHeight: 1.1 }}>{agentWorksCount}</div>
-                         <div style={{ fontSize: '0.68em', color: isLight ? '#64748b' : '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '2px' }}>Agent Works</div>
-                     </div>
 
-                     {/* Changes Stat */}
-                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', minWidth: '80px' }}>
-                         <div style={{
-                             width: '42px',
-                             height: '42px',
-                             borderRadius: '12px',
-                             background: isLight ? 'rgba(239,68,68,0.07)' : 'rgba(239,68,68,0.12)',
-                             display: 'flex',
-                             alignItems: 'center',
-                             justifyContent: 'center',
-                             fontSize: '1.1em',
-                             marginBottom: '4px',
-                             border: isLight ? '1px solid rgba(239,68,68,0.15)' : '1px solid rgba(239,68,68,0.25)'
-                         }}>
-                             ⚠️
+                         {/* Changes Stat */}
+                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', minWidth: '70px' }}>
+                             <div style={{
+                                 width: '42px',
+                                 height: '42px',
+                                 borderRadius: '12px',
+                                 background: isLight ? 'rgba(239,68,68,0.07)' : 'rgba(239,68,68,0.12)',
+                                 display: 'flex',
+                                 alignItems: 'center',
+                                 justifyContent: 'center',
+                                 fontSize: '1.1em',
+                                 marginBottom: '4px',
+                                 border: isLight ? '1px solid rgba(239,68,68,0.15)' : '1px solid rgba(239,68,68,0.25)'
+                             }}>
+                                 ⚠️
+                             </div>
+                             <div style={{ fontSize: '1.15em', fontWeight: 800, color: isLight ? '#1e293b' : '#e2e8f0', lineHeight: 1.1 }}>{changesCount}</div>
+                             <div style={{ fontSize: '0.68em', color: isLight ? '#64748b' : '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '2px' }}>Changes</div>
                          </div>
-                         <div style={{ fontSize: '1.15em', fontWeight: 800, color: isLight ? '#1e293b' : '#e2e8f0', lineHeight: 1.1 }}>{changesCount}</div>
-                         <div style={{ fontSize: '0.68em', color: isLight ? '#64748b' : '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '2px' }}>Changes</div>
                      </div>
 
                      {/* Vertical divider */}
-                     <div style={{ width: '1px', height: '42px', background: isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)', margin: '0 10px' }} />
+                     <div className="worker-hero-divider" style={{ width: '1px', height: '42px', background: isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)', margin: '0 6px' }} />
 
                      {/* Points block */}
-                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: isLight ? 'rgba(16,185,129,0.05)' : 'rgba(16,185,129,0.08)', borderRadius: '12px', padding: '10px 16px', border: '1px solid rgba(16,185,129,0.15)' }}>
+                     <div className="worker-hero-points" style={{ display: 'flex', alignItems: 'center', gap: '12px', background: isLight ? 'rgba(16,185,129,0.05)' : 'rgba(16,185,129,0.08)', borderRadius: '12px', padding: '10px 16px', border: '1px solid rgba(16,185,129,0.15)' }}>
                          <div style={{ width:'36px', height:'36px', borderRadius:'10px', background:'linear-gradient(135deg, #10b981, #3b82f6)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.1em' }}>🏆</div>
                          <div>
                              <p style={{ margin:0, fontSize:'0.65em', color:'#10b981', textTransform:'uppercase', letterSpacing:'1px', fontWeight:700 }}>My Points</p>
@@ -1518,7 +1520,7 @@ function WorkerDashboard({ router }) {
              </div>
 
              {/* Tab Navigation */}
-             <div style={{ display:'flex', gap:'8px', padding:'6px', background: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)', borderRadius:'14px', border: `1px solid ${isLight ? '#e2e8f0' : 'rgba(255,255,255,0.06)'}`, width:'fit-content', marginBottom:'20px', flexWrap: 'wrap' }}>
+             <div className="worker-tabs-bar" style={{ background: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)', border: `1px solid ${isLight ? '#e2e8f0' : 'rgba(255,255,255,0.06)'}` }}>
                  <button style={tabStyle('overview')} onClick={() => setActiveTab('overview')}>📂 Today's Operations</button>
                  <button style={tabStyle('flow')} onClick={() => setActiveTab('flow')}>🗓️ Operations Flow</button>
                  <button style={tabStyle('calendar')} onClick={() => setActiveTab('calendar')}>📅 Calendar View</button>
@@ -1832,113 +1834,157 @@ function WorkerDashboard({ router }) {
                          )}
 
 
-                         {/* Kanban columns */}
-                         <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'14px', alignItems:'start' }}>
-                             {columns.map(col => {
-                                 const colTasks = getColTasks(col.id);
-                                 return (
-                                     <div key={col.id} style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
-                                         <div style={{ display:'flex', alignItems:'center', gap:'8px', padding:'10px 14px', borderRadius:'12px', background: col.bg, border:`1px solid ${col.border}` }}>
-                                             <span>{col.emoji}</span>
-                                             <span style={{ fontWeight:700, fontSize:'0.86em', color: col.color }}>{col.label}</span>
-                                             <span style={{ marginLeft:'auto', minWidth:'22px', height:'22px', borderRadius:'50%', background: col.color, color:'#fff', fontSize:'0.72em', fontWeight:800, display:'flex', alignItems:'center', justifyContent:'center' }}>{colTasks.length}</span>
-                                         </div>
+                          {/* Mobile Quick Column Jump Navigation */}
+                          <div className="worker-kanban-mobile-nav">
+                              {columns.map(col => {
+                                  const colTasks = getColTasks(col.id);
+                                  return (
+                                      <button
+                                          key={col.id}
+                                          type="button"
+                                          onClick={() => {
+                                              const el = document.getElementById(`worker-col-${col.id}`);
+                                              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+                                          }}
+                                          className="worker-kanban-nav-pill"
+                                          style={{
+                                              background: col.bg,
+                                              border: `1px solid ${col.border}`,
+                                              color: col.color
+                                          }}
+                                      >
+                                          <span>{col.emoji} {col.label}</span>
+                                          <span style={{
+                                              minWidth: '20px',
+                                              height: '20px',
+                                              borderRadius: '10px',
+                                              background: col.color,
+                                              color: '#fff',
+                                              fontSize: '0.85em',
+                                              fontWeight: 800,
+                                              display: 'inline-flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              padding: '0 6px'
+                                          }}>
+                                              {colTasks.length}
+                                          </span>
+                                      </button>
+                                  );
+                              })}
+                          </div>
 
-                                         <div style={{ display:'flex', flexDirection:'column', gap:'8px', minHeight:'60px' }}>
-                                             {colTasks.length === 0 && (
-                                                 <div style={{ padding:'20px 14px', textAlign:'center', color:'var(--text-muted)', fontSize:'0.8em', borderRadius:'12px', border:`1px dashed ${col.border}`, background: isLight ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.02)' }}>No tasks</div>
-                                             )}
-                                             {colTasks.map(t => {
-                                                 const dueDate = processDateLocal(t.due_date);
-                                                 const isOverdue = dueDate && dueDate < todayLocalStr && t.status !== 'Completed' && t.status !== 'Approved';
-                                                 const isDueToday = dueDate === todayLocalStr;
-                                                 const isDone = t.status === 'Completed' || t.status === 'Approved';
-                                                 return (
-                                                      <div key={t.id} onClick={() => setSelectedTask(t)}
-                                                          style={{
-                                                              padding:'14px',
-                                                              borderRadius:'12px',
-                                                              background: isLight ? '#ffffff' : 'rgba(255,255,255,0.04)',
-                                                              border: t.is_urgent 
-                                                                  ? '1px solid rgba(239,68,68,0.5)' 
-                                                                  : (isOverdue ? '1px solid rgba(239,68,68,0.4)' : `1px solid ${isLight ? '#e2e8f0' : 'rgba(255,255,255,0.07)'}`),
-                                                              boxShadow: t.is_urgent
-                                                                  ? (isLight ? '0 1px 8px rgba(239,68,68,0.08)' : '0 0 12px rgba(239,68,68,0.15)')
-                                                                  : (isLight ? '0 1px 6px rgba(0,0,0,0.05)' : 'none'),
-                                                              transition:'box-shadow 0.2s, transform 0.2s, border-color 0.2s',
-                                                              opacity: isDone ? 0.75 : 1, cursor: 'pointer'
-                                                          }}
-                                                          onMouseEnter={e => { e.currentTarget.style.boxShadow = t.is_urgent ? (isLight ? '0 4px 16px rgba(239,68,68,0.2)' : '0 0 16px rgba(239,68,68,0.3)') : (isLight ? '0 4px 16px rgba(0,0,0,0.1)' : '0 4px 16px rgba(0,0,0,0.3)'); e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                                                          onMouseLeave={e => { e.currentTarget.style.boxShadow = t.is_urgent ? (isLight ? '0 1px 8px rgba(239,68,68,0.08)' : '0 0 12px rgba(239,68,68,0.15)') : (isLight ? '0 1px 6px rgba(0,0,0,0.05)' : 'none'); e.currentTarget.style.transform = 'translateY(0)'; }}
-                                                      >
-                                                          <div style={{ marginBottom:'8px' }}>
-                                                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '4px' }}>
-                                                                  <div style={{ fontWeight:700, fontSize:'0.88em', color: isLight ? '#1e293b' : '#e2e8f0', textDecoration: isDone ? 'line-through' : 'none', lineHeight: 1.3 }}>{t.title}</div>
-                                                                  {t.is_urgent && (
-                                                                      <span style={{
-                                                                          fontSize: '0.65em',
-                                                                          fontWeight: 800,
-                                                                          color: '#ef4444',
-                                                                          background: 'rgba(239,68,68,0.12)',
-                                                                          border: '1px solid rgba(239,68,68,0.3)',
-                                                                          padding: '2px 6px',
-                                                                          borderRadius: '6px',
-                                                                          textTransform: 'uppercase',
-                                                                          letterSpacing: '0.5px',
-                                                                          display: 'inline-flex',
-                                                                          alignItems: 'center',
-                                                                          gap: '3px',
-                                                                          flexShrink: 0
-                                                                      }}>
-                                                                          🚨 Urgent
-                                                                      </span>
-                                                                  )}
-                                                              </div>
-                                                              {t.description && <div style={{ fontSize:'0.74em', color:'var(--text-muted)', overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', marginBottom:'6px' }}>{t.description}</div>}
-                                                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.74em', color: 'var(--text-muted)', marginTop: '6px' }}>
-                                                                 <span style={{ fontWeight: 600 }}>Agent:</span>
-                                                                 <span style={{
-                                                                     padding: '2px 6px',
-                                                                     borderRadius: '6px',
-                                                                     background: t.assigned_by_ai ? 'rgba(139,92,246,0.1)' : (isLight ? '#f1f5f9' : 'rgba(255,255,255,0.06)'),
-                                                                     color: t.assigned_by_ai ? '#8b5cf6' : (isLight ? '#475569' : '#cbd5e1'),
-                                                                     fontWeight: 600,
-                                                                     display: 'inline-flex',
-                                                                     alignItems: 'center',
-                                                                     gap: '4px'
-                                                                 }}>
-                                                                     {t.assigned_by_ai ? '🤖 AI Agent' : `👤 ${t.assigner_name || 'Admin'}`}
-                                                                 </span>
-                                                             </div>
-                                                         </div>
-                                                         {dueDate && (
-                                                             <div style={{ fontSize:'0.7em', fontWeight:600, padding:'2px 7px', borderRadius:'6px', display:'inline-flex', alignItems:'center', gap:'3px', marginBottom:'8px', background: isOverdue ? 'rgba(239,68,68,0.1)' : isDueToday ? 'rgba(245,158,11,0.1)' : (isLight ? '#f1f5f9' : 'rgba(255,255,255,0.06)'), color: isOverdue ? '#dc2626' : isDueToday ? '#d97706' : 'var(--text-muted)' }}>
-                                                                 {isOverdue ? '⚠️ Overdue' : isDueToday ? '🔴 Today' : `📅 ${new Date(dueDate + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric'})}`}
-                                                             </div>
-                                                         )}
-                                                         {!isDone ? (
-                                                             <select value={taskState[t.id]?.status || t.status} onClick={e => e.stopPropagation()} onChange={e => handleKanbanStatus(t.id, e.target.value)}
-                                                                 style={{ width:'100%', padding:'5px 8px', fontSize:'0.74em', borderRadius:'8px', border:`1px solid ${col.border}`, background: isLight ? '#f8fafc' : 'rgba(0,0,0,0.25)', color: col.color, fontWeight:600, cursor:'pointer', outline:'none' }}>
-                                                                 <option value="Assigned">📌 Assigned</option>
-                                                                 <option value="In Progress">⚡ In Progress</option>
-                                                                  <option value="Change Making">🛠️ Change Making</option>
-                                                                 <option value="Pending Approval">🔔 Send for Approval</option>
-                                                                 <option value="Completed">✅ Completed</option>
-                                                             </select>
-                                                         ) : (
-                                                             <div style={{ fontSize:'0.74em', fontWeight:600, color: t.status === 'Approved' ? '#0284c7' : '#059669' }}>
-                                                                 {t.status === 'Approved' ? '✓ Approved' : '✓ Completed'}
-                                                             </div>
-                                                         )}
-                                                     </div>
-                                                 );
-                                             })}
-                                         </div>
-                                     </div>
-                                 );
-                             })}
-                         </div>
-                         {tasks.length === 0 && (
+                          {/* Kanban columns */}
+                          <div className="worker-kanban-board">
+                              {columns.map(col => {
+                                  const colTasks = getColTasks(col.id);
+                                  return (
+                                      <div key={col.id} id={`worker-col-${col.id}`} className="worker-kanban-col">
+                                          <div style={{ display:'flex', alignItems:'center', gap:'8px', padding:'10px 14px', borderRadius:'12px', background: col.bg, border:`1px solid ${col.border}` }}>
+                                              <span>{col.emoji}</span>
+                                              <span style={{ fontWeight:700, fontSize:'0.86em', color: col.color }}>{col.label}</span>
+                                              <span style={{ marginLeft:'auto', minWidth:'22px', height:'22px', borderRadius:'50%', background: col.color, color:'#fff', fontSize:'0.72em', fontWeight:800, display:'flex', alignItems:'center', justifyContent:'center' }}>{colTasks.length}</span>
+                                          </div>
+
+                                          <div style={{ display:'flex', flexDirection:'column', gap:'8px', minHeight:'60px' }}>
+                                              {colTasks.length === 0 && (
+                                                  <div style={{ padding:'20px 14px', textAlign:'center', color:'var(--text-muted)', fontSize:'0.8em', borderRadius:'12px', border:`1px dashed ${col.border}`, background: isLight ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.02)' }}>No tasks</div>
+                                              )}
+                                              {colTasks.map(t => {
+                                                  const dueDate = processDateLocal(t.due_date);
+                                                  const isOverdue = dueDate && dueDate < todayLocalStr && t.status !== 'Completed' && t.status !== 'Approved';
+                                                  const isDueToday = dueDate === todayLocalStr;
+                                                  const isDone = t.status === 'Completed' || t.status === 'Approved';
+                                                  return (
+                                                       <div key={t.id} onClick={() => setSelectedTask(t)}
+                                                           style={{
+                                                               padding:'14px',
+                                                               borderRadius:'12px',
+                                                               background: isLight ? '#ffffff' : 'rgba(255,255,255,0.04)',
+                                                               border: t.is_urgent 
+                                                                   ? '1px solid rgba(239,68,68,0.5)' 
+                                                                   : (isOverdue ? '1px solid rgba(239,68,68,0.4)' : `1px solid ${isLight ? '#e2e8f0' : 'rgba(255,255,255,0.07)'}`),
+                                                               boxShadow: t.is_urgent
+                                                                   ? (isLight ? '0 1px 8px rgba(239,68,68,0.08)' : '0 0 12px rgba(239,68,68,0.15)')
+                                                                   : (isLight ? '0 1px 6px rgba(0,0,0,0.05)' : 'none'),
+                                                               transition:'box-shadow 0.2s, transform 0.2s, border-color 0.2s',
+                                                               opacity: isDone ? 0.75 : 1, cursor: 'pointer'
+                                                           }}
+                                                           onMouseEnter={e => { e.currentTarget.style.boxShadow = t.is_urgent ? (isLight ? '0 4px 16px rgba(239,68,68,0.2)' : '0 0 16px rgba(239,68,68,0.3)') : (isLight ? '0 4px 16px rgba(0,0,0,0.1)' : '0 4px 16px rgba(0,0,0,0.3)'); e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                                                           onMouseLeave={e => { e.currentTarget.style.boxShadow = t.is_urgent ? (isLight ? '0 1px 8px rgba(239,68,68,0.08)' : '0 0 12px rgba(239,68,68,0.15)') : (isLight ? '0 1px 6px rgba(0,0,0,0.05)' : 'none'); e.currentTarget.style.transform = 'translateY(0)'; }}
+                                                       >
+                                                           <div style={{ marginBottom:'8px' }}>
+                                                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '4px' }}>
+                                                                   <div style={{ fontWeight:700, fontSize:'0.88em', color: isLight ? '#1e293b' : '#e2e8f0', textDecoration: isDone ? 'line-through' : 'none', lineHeight: 1.3, wordBreak: 'break-word' }}>{t.title}</div>
+                                                                   {t.is_urgent && (
+                                                                       <span style={{
+                                                                           fontSize: '0.65em',
+                                                                           fontWeight: 800,
+                                                                           color: '#ef4444',
+                                                                           background: 'rgba(239,68,68,0.12)',
+                                                                           border: '1px solid rgba(239,68,68,0.3)',
+                                                                           padding: '2px 6px',
+                                                                           borderRadius: '6px',
+                                                                           textTransform: 'uppercase',
+                                                                           letterSpacing: '0.5px',
+                                                                           display: 'inline-flex',
+                                                                           alignItems: 'center',
+                                                                           gap: '3px',
+                                                                           flexShrink: 0
+                                                                       }}>
+                                                                           🚨 Urgent
+                                                                       </span>
+                                                                   )}
+                                                               </div>
+                                                               {t.description && <div style={{ fontSize:'0.74em', color:'var(--text-muted)', overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', marginBottom:'6px', wordBreak: 'break-word' }}>{t.description}</div>}
+                                                               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.74em', color: 'var(--text-muted)', marginTop: '6px', flexWrap: 'wrap' }}>
+                                                                   <span style={{ fontWeight: 600 }}>Agent:</span>
+                                                                   <span style={{
+                                                                       padding: '2px 6px',
+                                                                       borderRadius: '6px',
+                                                                       background: t.assigned_by_ai ? 'rgba(139,92,246,0.1)' : (isLight ? '#f1f5f9' : 'rgba(255,255,255,0.06)'),
+                                                                       color: t.assigned_by_ai ? '#8b5cf6' : (isLight ? '#475569' : '#cbd5e1'),
+                                                                       fontWeight: 600,
+                                                                       display: 'inline-flex',
+                                                                       alignItems: 'center',
+                                                                       gap: '4px',
+                                                                       maxWidth: '100%',
+                                                                       overflow: 'hidden',
+                                                                       textOverflow: 'ellipsis',
+                                                                       whiteSpace: 'nowrap'
+                                                                   }}>
+                                                                       {t.assigned_by_ai ? '🤖 AI Agent' : `👤 ${t.assigner_name || 'Admin'}`}
+                                                                   </span>
+                                                               </div>
+                                                           </div>
+                                                           {dueDate && (
+                                                               <div style={{ fontSize:'0.7em', fontWeight:600, padding:'2px 7px', borderRadius:'6px', display:'inline-flex', alignItems:'center', gap:'3px', marginBottom:'8px', background: isOverdue ? 'rgba(239,68,68,0.1)' : isDueToday ? 'rgba(245,158,11,0.1)' : (isLight ? '#f1f5f9' : 'rgba(255,255,255,0.06)'), color: isOverdue ? '#dc2626' : isDueToday ? '#d97706' : 'var(--text-muted)' }}>
+                                                                   {isOverdue ? '⚠️ Overdue' : isDueToday ? '🔴 Today' : `📅 ${new Date(dueDate + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric'})}`}
+                                                               </div>
+                                                           )}
+                                                           {!isDone ? (
+                                                               <select value={taskState[t.id]?.status || t.status} onClick={e => e.stopPropagation()} onChange={e => handleKanbanStatus(t.id, e.target.value)}
+                                                                   style={{ width:'100%', padding:'6px 10px', fontSize:'0.76em', borderRadius:'8px', border:`1px solid ${col.border}`, background: isLight ? '#f8fafc' : 'rgba(0,0,0,0.3)', color: col.color, fontWeight:600, cursor:'pointer', outline:'none' }}>
+                                                                   <option value="Assigned">📌 Assigned</option>
+                                                                   <option value="In Progress">⚡ In Progress</option>
+                                                                    <option value="Change Making">🛠️ Change Making</option>
+                                                                   <option value="Pending Approval">🔔 Send for Approval</option>
+                                                                   <option value="Completed">✅ Completed</option>
+                                                               </select>
+                                                           ) : (
+                                                               <div style={{ fontSize:'0.74em', fontWeight:600, color: t.status === 'Approved' ? '#0284c7' : '#059669' }}>
+                                                                   {t.status === 'Approved' ? '✓ Approved' : '✓ Completed'}
+                                                               </div>
+                                                           )}
+                                                       </div>
+                                                  );
+                                              })}
+                                          </div>
+                                      </div>
+                                  );
+                              })}
+                          </div>
+                          {tasks.length === 0 && (
                              <div className="glass-panel" style={{ padding:'50px', textAlign:'center' }}>
                                  <p style={{ color:'var(--text-muted)', fontSize:'1.1em' }}>No operations currently assigned.</p>
                              </div>
