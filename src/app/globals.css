@@ -421,8 +421,8 @@ a { text-decoration: none; color: inherit; }
 
 }
 
-.sidebar-logo { display:flex; align-items:center; gap:12px; margin-bottom: 20px; padding: 0 6px;}
 .topbar-mobile-logo { display: none !important; }
+.mobile-install-actions { display: none !important; }
 
 .sidebar-link {
 
@@ -949,6 +949,14 @@ body.dark-mode .network-scroll-container::-webkit-scrollbar-track {
 
   .mobile-close-btn {
     display: inline-flex !important;
+  }
+
+  .mobile-install-actions {
+    display: flex !important;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .mobile-backdrop {
