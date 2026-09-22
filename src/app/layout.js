@@ -37,7 +37,21 @@ export default function RootLayout({ children }) {
               } catch(e) {}
               if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js').catch(function() {});
+                  navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                    if (reg) {
+                      reg.update().catch(function() {});
+                      reg.onupdatefound = function() {
+                        var installing = reg.installing;
+                        if (installing) {
+                          installing.onstatechange = function() {
+                            if (installing.state === 'installed' && navigator.serviceWorker.controller) {
+                              window.location.reload();
+                            }
+                          };
+                        }
+                      };
+                    }
+                  }).catch(function() {});
                 });
               }
             `,

@@ -1208,29 +1208,6 @@ body.dark-mode .network-scroll-container::-webkit-scrollbar-track {
     width: 100%;
   }
 
-  .worker-kanban-mobile-nav {
-    display: flex;
-  }
-
-  .worker-kanban-board {
-    display: flex;
-    overflow-x: auto;
-    overflow-y: visible;
-    gap: 14px;
-    padding-bottom: 16px;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-    scrollbar-width: thin;
-  }
-
-  .worker-kanban-col {
-    flex: 0 0 min(290px, 85vw);
-    min-width: min(280px, 85vw);
-    max-width: 320px;
-    scroll-snap-align: start;
-  }
-
   .worker-hero-stats-row {
     width: 100%;
     justify-content: space-between;
@@ -1249,6 +1226,14 @@ body.dark-mode .network-scroll-container::-webkit-scrollbar-track {
 /* ── Worker Kanban Native App Switcher Styles ── */
 .worker-kanban-desktop {
   display: block;
+  width: 100%;
+}
+
+.worker-kanban-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
   width: 100%;
 }
 
@@ -1286,7 +1271,7 @@ body.dark-mode .network-scroll-container::-webkit-scrollbar-track {
   -webkit-tap-highlight-color: transparent;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 900px) {
   .worker-kanban-desktop {
     display: none !important;
   }
