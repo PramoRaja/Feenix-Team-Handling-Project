@@ -1392,7 +1392,7 @@ function WorkerDashboard({ router }) {
     const changesCount = tasks.filter(t => t.status === 'Having Changes').length;
 
     const tabStyle = (tab) => ({
-        padding: '10px 22px', borderRadius: '10px', fontWeight: 600, fontSize: '0.9em',
+        padding: '10px 18px', borderRadius: '10px', fontWeight: 600, fontSize: '0.88em',
         cursor: 'pointer', border: 'none', transition: 'all 0.2s',
         background: activeTab === tab
             ? (isLight ? '#3b82f6' : 'rgba(59,130,246,0.2)')
@@ -1401,6 +1401,11 @@ function WorkerDashboard({ router }) {
             ? (isLight ? '#ffffff' : '#60a5fa')
             : (isLight ? '#64748b' : '#94a3b8'),
         boxShadow: activeTab === tab ? '0 4px 12px rgba(59,130,246,0.25)' : 'none',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '4px',
+        whiteSpace: 'nowrap'
     });
 
     return (
@@ -1422,6 +1427,10 @@ function WorkerDashboard({ router }) {
                  alignItems: 'center',
                  flexWrap: 'wrap',
                  gap: '20px',
+                 width: '100%',
+                 maxWidth: '100%',
+                 minWidth: 0,
+                 boxSizing: 'border-box'
              }}>
                  <div style={{ position:'absolute', top:'-30px', right:'-30px', width:'140px', height:'140px', borderRadius:'50%', background:'rgba(139,92,246,0.07)', pointerEvents:'none' }} />
                  <div style={{ position:'absolute', bottom:'-20px', left:'40%', width:'100px', height:'100px', borderRadius:'50%', background:'rgba(59,130,246,0.06)', pointerEvents:'none' }} />
@@ -1523,11 +1532,25 @@ function WorkerDashboard({ router }) {
              </div>
 
              {/* Tab Navigation */}
-             <div className="worker-tabs-bar" style={{ background: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)', border: `1px solid ${isLight ? '#e2e8f0' : 'rgba(255,255,255,0.06)'}` }}>
-                 <button style={tabStyle('overview')} onClick={() => setActiveTab('overview')}>📂 Today's Operations</button>
-                 <button style={tabStyle('flow')} onClick={() => setActiveTab('flow')}>🗓️ Operations Flow</button>
-                 <button style={tabStyle('calendar')} onClick={() => setActiveTab('calendar')}>📅 Calendar View</button>
-                 {isAuthorizedAssign && <button style={tabStyle('team')} onClick={() => setActiveTab('team')}>👥 Team Operations</button>}
+             <div className="worker-tabs-bar" style={{ background: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)', border: `1px solid ${isLight ? '#e2e8f0' : 'rgba(255,255,255,0.06)'}`, width: '100%', maxWidth: '100%', minWidth: 0, boxSizing: 'border-box' }}>
+                 <button style={tabStyle('overview')} onClick={() => setActiveTab('overview')}>
+                     <span className="tab-text-desktop">📂 Today's Operations</span>
+                     <span className="tab-text-mobile">📂 Today</span>
+                 </button>
+                 <button style={tabStyle('flow')} onClick={() => setActiveTab('flow')}>
+                     <span className="tab-text-desktop">🗓️ Operations Flow</span>
+                     <span className="tab-text-mobile">🗓️ Flow</span>
+                 </button>
+                 <button style={tabStyle('calendar')} onClick={() => setActiveTab('calendar')}>
+                     <span className="tab-text-desktop">📅 Calendar View</span>
+                     <span className="tab-text-mobile">📅 Calendar</span>
+                 </button>
+                 {isAuthorizedAssign && (
+                     <button style={tabStyle('team')} onClick={() => setActiveTab('team')}>
+                         <span className="tab-text-desktop">👥 Team Operations</span>
+                         <span className="tab-text-mobile">👥 Team</span>
+                     </button>
+                 )}
              </div>
 
              {/* ── FLOW BOARD TAB ── */}
@@ -1773,12 +1796,12 @@ function WorkerDashboard({ router }) {
 
              {/* ── KANBAN BOARD TAB ── */}
              {activeTab === 'overview' && (() => {
-                 const columns = [
-                      { id: 'urgent',           label: 'Urgent Works',     emoji: '🚨', color: '#ef4444', bg: 'rgba(239,68,68,0.08)',  border: 'rgba(239,68,68,0.2)' },
-                      { id: 'Assigned',         label: 'Assigned',         emoji: '📌', color: '#3b82f6', bg: 'rgba(59,130,246,0.08)',  border: 'rgba(59,130,246,0.2)'  },
-                      { id: 'In Progress',      label: 'In Progress',      emoji: '⚡', color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)' },
-                      { id: 'Pending Approval', label: 'Pending Approval', emoji: '🔔', color: '#8b5cf6', bg: 'rgba(139,92,246,0.08)', border: 'rgba(139,92,246,0.2)' },
-                  ];
+                  const columns = [
+                       { id: 'urgent',           label: 'Urgent Works',     shortLabel: 'Urgent',   emoji: '🚨', color: '#ef4444', bg: 'rgba(239,68,68,0.08)',  border: 'rgba(239,68,68,0.2)' },
+                       { id: 'Assigned',         label: 'Assigned',         shortLabel: 'Assigned', emoji: '📌', color: '#3b82f6', bg: 'rgba(59,130,246,0.08)',  border: 'rgba(59,130,246,0.2)'  },
+                       { id: 'In Progress',      label: 'In Progress',      shortLabel: 'Progress', emoji: '⚡', color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)' },
+                       { id: 'Pending Approval', label: 'Pending Approval', shortLabel: 'Pending',  emoji: '🔔', color: '#8b5cf6', bg: 'rgba(139,92,246,0.08)', border: 'rgba(139,92,246,0.2)' },
+                   ];
 
                  const getColTasks = (colId) => {
                       if (colId === 'urgent') {
@@ -1813,29 +1836,32 @@ function WorkerDashboard({ router }) {
                  const todayLocal = new Date();
                  const todayLocalStr = new Date(todayLocal.getTime() - (todayLocal.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
 
-                  const renderKanbanCard = (t, col) => {
-                      const dueDate = processDateLocal(t.due_date);
-                      const isOverdue = dueDate && dueDate < todayLocalStr && t.status !== 'Completed' && t.status !== 'Approved';
-                      const isDueToday = dueDate === todayLocalStr;
-                      const isDone = t.status === 'Completed' || t.status === 'Approved';
-                      return (
-                           <div key={t.id} onClick={() => setSelectedTask(t)}
-                               style={{
-                                   padding:'14px',
-                                   borderRadius:'14px',
-                                   background: isLight ? '#ffffff' : 'rgba(255,255,255,0.04)',
-                                   border: t.is_urgent 
-                                       ? '1px solid rgba(239,68,68,0.5)' 
-                                       : (isOverdue ? '1px solid rgba(239,68,68,0.4)' : `1px solid ${isLight ? '#e2e8f0' : 'rgba(255,255,255,0.07)'}`),
-                                   boxShadow: t.is_urgent
-                                       ? (isLight ? '0 2px 10px rgba(239,68,68,0.1)' : '0 0 14px rgba(239,68,68,0.2)')
-                                       : (isLight ? '0 1px 6px rgba(0,0,0,0.05)' : 'none'),
-                                   transition:'box-shadow 0.2s, transform 0.2s, border-color 0.2s',
-                                   opacity: isDone ? 0.75 : 1,
-                                   cursor: 'pointer',
-                                   width: '100%',
-                                   boxSizing: 'border-box'
-                               }}
+                   const renderKanbanCard = (t, col) => {
+                       const dueDate = processDateLocal(t.due_date);
+                       const isOverdue = dueDate && dueDate < todayLocalStr && t.status !== 'Completed' && t.status !== 'Approved';
+                       const isDueToday = dueDate === todayLocalStr;
+                       const isDone = t.status === 'Completed' || t.status === 'Approved';
+                       return (
+                            <div key={t.id} onClick={() => setSelectedTask(t)}
+                                style={{
+                                    padding:'14px',
+                                    borderRadius:'14px',
+                                    background: isLight ? '#ffffff' : 'rgba(255,255,255,0.04)',
+                                    border: t.is_urgent 
+                                        ? '1px solid rgba(239,68,68,0.5)' 
+                                        : (isOverdue ? '1px solid rgba(239,68,68,0.4)' : `1px solid ${isLight ? '#e2e8f0' : 'rgba(255,255,255,0.07)'}`),
+                                    boxShadow: t.is_urgent
+                                        ? (isLight ? '0 2px 10px rgba(239,68,68,0.1)' : '0 0 14px rgba(239,68,68,0.2)')
+                                        : (isLight ? '0 1px 6px rgba(0,0,0,0.05)' : 'none'),
+                                    transition:'box-shadow 0.2s, transform 0.2s, border-color 0.2s',
+                                    opacity: isDone ? 0.75 : 1,
+                                    cursor: 'pointer',
+                                    width: '100%',
+                                    maxWidth: '100%',
+                                    minWidth: 0,
+                                    boxSizing: 'border-box',
+                                    overflow: 'hidden'
+                                }}
                                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
                                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
                            >
@@ -1954,54 +1980,54 @@ function WorkerDashboard({ router }) {
                               </div>
                           </div>
 
-                          {/* Mobile App Kanban View (<= 768px) */}
-                          <div className="worker-kanban-mobile">
-                              {/* Segmented Column Switcher Tabs */}
-                              <div className="worker-kanban-mobile-tabs">
-                                  {columns.map(col => {
-                                      const colTasks = getColTasks(col.id);
-                                      const isActive = (selectedKanbanCol || 'urgent') === col.id;
-                                      return (
-                                          <button
-                                              key={col.id}
-                                              type="button"
-                                              onClick={() => setSelectedKanbanCol(col.id)}
-                                              className={`worker-kanban-tab-btn ${isActive ? 'active' : ''}`}
-                                              style={{
-                                                  background: isActive ? col.bg : (isLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)'),
-                                                  border: `1.5px solid ${isActive ? col.color : (isLight ? '#cbd5e1' : 'rgba(255,255,255,0.08)')}`,
-                                                  color: isActive ? col.color : 'var(--text-muted)',
-                                                  boxShadow: isActive ? `0 2px 10px ${col.border}` : 'none',
-                                              }}
-                                          >
-                                              <span style={{ fontSize: '1.05em' }}>{col.emoji}</span>
-                                              <span style={{ fontWeight: 700 }}>{col.label}</span>
-                                              <span style={{
-                                                  minWidth: '20px',
-                                                  height: '20px',
-                                                  borderRadius: '10px',
-                                                  background: isActive ? col.color : (isLight ? '#94a3b8' : 'rgba(255,255,255,0.2)'),
-                                                  color: '#fff',
-                                                  fontSize: '0.75em',
-                                                  fontWeight: 800,
-                                                  display: 'inline-flex',
-                                                  alignItems: 'center',
-                                                  justifyContent: 'center',
-                                                  padding: '0 5px'
-                                              }}>
-                                                  {colTasks.length}
-                                              </span>
-                                          </button>
-                                      );
-                                  })}
-                              </div>
+                           {/* Mobile App Kanban View (<= 768px) */}
+                           <div className="worker-kanban-mobile" style={{ width: '100%', maxWidth: '100%', minWidth: 0, boxSizing: 'border-box' }}>
+                               {/* Segmented Column Switcher Tabs */}
+                               <div className="worker-kanban-mobile-tabs" style={{ width: '100%', maxWidth: '100%', minWidth: 0, boxSizing: 'border-box' }}>
+                                   {columns.map(col => {
+                                       const colTasks = getColTasks(col.id);
+                                       const isActive = (selectedKanbanCol || 'urgent') === col.id;
+                                       return (
+                                           <button
+                                               key={col.id}
+                                               type="button"
+                                               onClick={() => setSelectedKanbanCol(col.id)}
+                                               className={`worker-kanban-tab-btn ${isActive ? 'active' : ''}`}
+                                               style={{
+                                                   background: isActive ? col.bg : (isLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)'),
+                                                   border: `1.5px solid ${isActive ? col.color : (isLight ? '#cbd5e1' : 'rgba(255,255,255,0.08)')}`,
+                                                   color: isActive ? col.color : 'var(--text-muted)',
+                                                   boxShadow: isActive ? `0 2px 10px ${col.border}` : 'none',
+                                               }}
+                                           >
+                                               <span style={{ fontSize: '1.05em' }}>{col.emoji}</span>
+                                               <span style={{ fontWeight: 700 }}>{col.shortLabel || col.label}</span>
+                                               <span style={{
+                                                   minWidth: '20px',
+                                                   height: '20px',
+                                                   borderRadius: '10px',
+                                                   background: isActive ? col.color : (isLight ? '#94a3b8' : 'rgba(255,255,255,0.2)'),
+                                                   color: '#fff',
+                                                   fontSize: '0.75em',
+                                                   fontWeight: 800,
+                                                   display: 'inline-flex',
+                                                   alignItems: 'center',
+                                                   justifyContent: 'center',
+                                                   padding: '0 5px'
+                                               }}>
+                                                   {colTasks.length}
+                                               </span>
+                                           </button>
+                                       );
+                                   })}
+                               </div>
 
-                              {/* Selected Column Task Cards (Full Width, 100% Native App Feel) */}
-                              {(() => {
-                                  const activeColObj = columns.find(c => c.id === (selectedKanbanCol || 'urgent')) || columns[0];
-                                  const activeColTasks = getColTasks(activeColObj.id);
-                                  return (
-                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
+                               {/* Selected Column Task Cards (Full Width, 100% Native App Feel) */}
+                               {(() => {
+                                   const activeColObj = columns.find(c => c.id === (selectedKanbanCol || 'urgent')) || columns[0];
+                                   const activeColTasks = getColTasks(activeColObj.id);
+                                   return (
+                                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', maxWidth: '100%', minWidth: 0, boxSizing: 'border-box' }}>
                                           {activeColTasks.length === 0 ? (
                                               <div style={{
                                                   padding: '36px 20px',
