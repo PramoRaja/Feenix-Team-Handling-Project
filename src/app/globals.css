@@ -980,12 +980,9 @@ body.dark-mode .network-scroll-container::-webkit-scrollbar-track {
     z-index: 100 !important;
   }
 
-  .topbar h2 {
-    font-size: 1.1em !important;
-    max-width: 140px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .topbar h2,
+  .topbar-title {
+    display: none !important;
   }
 
   .topbar-right {
@@ -1132,9 +1129,9 @@ body.dark-mode .network-scroll-container::-webkit-scrollbar-track {
     grid-template-columns: 1fr !important;
   }
 
-  .topbar h2 {
-    font-size: 0.95em !important;
-    max-width: 110px;
+  .topbar h2,
+  .topbar-title {
+    display: none !important;
   }
 
   .auth-card {
