@@ -446,6 +446,31 @@ function MonthlyOpsViewer({ tasks, fetchData, workers }) {
     });
 
     const [activeMonth, setActiveMonth] = useState(todayKey);
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
+
+    const handlePrevMonth = () => {
+        const [yr, mo] = activeMonth.split('-').map(Number);
+        const prevD = new Date(yr, mo - 2, 1);
+        const prevStr = `${prevD.getFullYear()}-${String(prevD.getMonth() + 1).padStart(2, '0')}`;
+        if (!allMonths.includes(prevStr)) {
+            allMonths.push(prevStr);
+            allMonths.sort().reverse();
+        }
+        setActiveMonth(prevStr);
+    };
+
+    const handleNextMonth = () => {
+        const [yr, mo] = activeMonth.split('-').map(Number);
+        const nextD = new Date(yr, mo, 1);
+        const nextStr = `${nextD.getFullYear()}-${String(nextD.getMonth() + 1).padStart(2, '0')}`;
+        if (!allMonths.includes(nextStr)) {
+            allMonths.push(nextStr);
+            allMonths.sort().reverse();
+        }
+        setActiveMonth(nextStr);
+    };
+
     const [activeWorker, setActiveWorker] = useState(null); // null = "Works" (All)
     const [scheduleOpen, setScheduleOpen] = useState(false);
     const [scheduleForm, setScheduleForm] = useState({});
@@ -592,28 +617,181 @@ function MonthlyOpsViewer({ tasks, fetchData, workers }) {
         <div className="glass-panel" style={{ padding: '0', borderRadius: '20px', overflow: 'hidden', border: '1px solid var(--panel-border)', marginBottom: '40px', display: 'flex', flexDirection: 'column' }}>
             
             {/* Top Toolbar */}
-            <div style={{ background: 'var(--toolbar-bg, rgba(15, 23, 42, 0.4))', backdropFilter: 'blur(10px)', padding: '16px 24px', display: 'flex', alignItems: 'center', gap: '20px', borderBottom: '1px solid var(--panel-border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 15px rgba(59,130,246,0.3)' }}>
+            <div style={{
+                background: isLight ? '#ffffff' : 'var(--toolbar-bg, rgba(15, 23, 42, 0.4))',
+                backdropFilter: 'blur(10px)',
+                padding: '14px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '12px',
+                borderBottom: `1px solid ${isLight ? '#e2e8f0' : 'var(--panel-border)'}`
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+                    <div style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '10px',
+                        background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 4px 15px rgba(59,130,246,0.3)',
+                        flexShrink: 0
+                    }}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     </div>
-                    <h3 style={{ margin: 0, fontSize: '1.2em', color: 'var(--header-text, var(--text-main))', letterSpacing: '0.5px' }}>Operations Flow</h3>
+                    <h3 style={{
+                        margin: 0,
+                        fontSize: '1.2em',
+                        fontWeight: 800,
+                        color: isLight ? '#0f172a' : 'var(--header-text, var(--text-main))',
+                        letterSpacing: '0.3px',
+                        whiteSpace: 'nowrap'
+                    }}>
+                        Operations Flow
+                    </h3>
                 </div>
                 
-                <div style={{ position: 'relative', marginLeft: '20px' }}>
-                    <select value={activeMonth} onChange={e => setActiveMonth(e.target.value)} style={{ padding: '8px 36px 8px 16px', borderRadius: '12px', border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text-main)', fontSize: '0.95em', fontWeight: 500, cursor: 'pointer', appearance: 'none', outline: 'none', transition: 'all 0.2s', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)' }}>
-                        {allMonths.map(mStr => {
-                            const [my, mm] = mStr.split('-');
-                            return <option key={mStr} value={mStr}>{MONTH_NAMES[parseInt(mm)-1]} {my}</option>;
-                        })}
-                    </select>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginLeft: 'auto' }}>
+                    {/* Month Navigator with Prev / Next and Dropdown */}
+                    <div style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        background: isLight ? '#f1f5f9' : 'rgba(255, 255, 255, 0.06)',
+                        border: `1px solid ${isLight ? '#cbd5e1' : 'rgba(255, 255, 255, 0.15)'}`,
+                        borderRadius: '12px',
+                        padding: '2px',
+                        flexShrink: 0
+                    }}>
+                        <button
+                            type="button"
+                            onClick={handlePrevMonth}
+                            title="Previous Month"
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: isLight ? '#334155' : '#cbd5e1',
+                                cursor: 'pointer',
+                                padding: '6px 9px',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '0.85em',
+                                fontWeight: 800,
+                                transition: 'background 0.15s'
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.background = isLight ? '#e2e8f0' : 'rgba(255,255,255,0.1)'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                        >
+                            ◀
+                        </button>
 
-                <button onClick={() => setScheduleOpen(!scheduleOpen)} className="btn-primary" style={{ marginLeft: 'auto', padding: '10px 20px', borderRadius: '12px', fontSize: '0.9em' }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    Add Task
-                </button>
+                        <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+                            <select
+                                value={activeMonth}
+                                onChange={e => setActiveMonth(e.target.value)}
+                                style={{
+                                    padding: '7px 32px 7px 12px',
+                                    borderRadius: '8px',
+                                    border: 'none',
+                                    background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.7)',
+                                    color: isLight ? '#0f172a' : '#f8fafc',
+                                    fontSize: '0.92em',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                    appearance: 'none',
+                                    WebkitAppearance: 'none',
+                                    outline: 'none',
+                                    minWidth: '150px',
+                                    boxShadow: isLight ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+                                    textAlign: 'center'
+                                }}
+                            >
+                                {allMonths.map(mStr => {
+                                    const [my, mm] = mStr.split('-');
+                                    const mName = MONTH_NAMES[parseInt(mm)-1];
+                                    return (
+                                        <option
+                                            key={mStr}
+                                            value={mStr}
+                                            style={{
+                                                background: isLight ? '#ffffff' : '#1e293b',
+                                                color: isLight ? '#0f172a' : '#f8fafc',
+                                                fontWeight: 600,
+                                                padding: '6px'
+                                            }}
+                                        >
+                                            {mName} {my}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                            <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke={isLight ? '#475569' : '#94a3b8'}
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
+                            >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={handleNextMonth}
+                            title="Next Month"
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: isLight ? '#334155' : '#cbd5e1',
+                                cursor: 'pointer',
+                                padding: '6px 9px',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '0.85em',
+                                fontWeight: 800,
+                                transition: 'background 0.15s'
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.background = isLight ? '#e2e8f0' : 'rgba(255,255,255,0.1)'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                        >
+                            ▶
+                        </button>
+                    </div>
+
+                    {/* Add Task Button */}
+                    <button
+                        onClick={() => setScheduleOpen(!scheduleOpen)}
+                        className="btn-primary"
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '9px 18px',
+                            borderRadius: '12px',
+                            fontSize: '0.88em',
+                            fontWeight: 700,
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0
+                        }}
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Task
+                    </button>
+                </div>
             </div>
 
             {/* Quick Add Task Inline Form */}
@@ -993,6 +1171,31 @@ function WorkerOpsFlow({ tasks, onStatusUpdate, onTaskClick }) {
     });
 
     const [activeMonth, setActiveMonth] = useState(todayKey);
+    const { theme } = useTheme();
+    const isLight = theme === 'light';
+
+    const handlePrevMonth = () => {
+        const [yr, mo] = activeMonth.split('-').map(Number);
+        const prevD = new Date(yr, mo - 2, 1);
+        const prevStr = `${prevD.getFullYear()}-${String(prevD.getMonth() + 1).padStart(2, '0')}`;
+        if (!allMonths.includes(prevStr)) {
+            allMonths.push(prevStr);
+            allMonths.sort().reverse();
+        }
+        setActiveMonth(prevStr);
+    };
+
+    const handleNextMonth = () => {
+        const [yr, mo] = activeMonth.split('-').map(Number);
+        const nextD = new Date(yr, mo, 1);
+        const nextStr = `${nextD.getFullYear()}-${String(nextD.getMonth() + 1).padStart(2, '0')}`;
+        if (!allMonths.includes(nextStr)) {
+            allMonths.push(nextStr);
+            allMonths.sort().reverse();
+        }
+        setActiveMonth(nextStr);
+    };
+
     const [pendingStatus, setPendingStatus] = useState({}); // { [taskId]: newStatus }
     const todayRowRef = useRef(null);
 
@@ -1043,24 +1246,161 @@ function WorkerOpsFlow({ tasks, onStatusUpdate, onTaskClick }) {
     return (
         <div className="glass-panel" style={{ padding: 0, borderRadius: '20px', overflow: 'hidden', border: '1px solid var(--panel-border)', marginBottom: '30px', display: 'flex', flexDirection: 'column' }}>
             {/* Header */}
-            <div style={{ background: 'rgba(15,23,42,0.4)', backdropFilter: 'blur(10px)', padding: '16px 24px', display: 'flex', alignItems: 'center', gap: '20px', borderBottom: '1px solid var(--panel-border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'linear-gradient(135deg, #10b981, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 15px rgba(16,185,129,0.3)' }}>
+            <div style={{
+                background: isLight ? '#ffffff' : 'rgba(15,23,42,0.4)',
+                backdropFilter: 'blur(10px)',
+                padding: '14px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '12px',
+                borderBottom: `1px solid ${isLight ? '#e2e8f0' : 'var(--panel-border)'}`
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+                    <div style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '10px',
+                        background: 'linear-gradient(135deg, #10b981, #3b82f6)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 4px 15px rgba(16,185,129,0.3)',
+                        flexShrink: 0
+                    }}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     </div>
-                    <h3 style={{ margin: 0, fontSize: '1.15em', color: 'var(--header-text, var(--text-main))', letterSpacing: '0.5px' }}>My Operations Flow</h3>
+                    <h3 style={{
+                        margin: 0,
+                        fontSize: '1.15em',
+                        fontWeight: 800,
+                        color: isLight ? '#0f172a' : 'var(--header-text, var(--text-main))',
+                        letterSpacing: '0.3px',
+                        whiteSpace: 'nowrap'
+                    }}>
+                        My Operations Flow
+                    </h3>
                 </div>
-                <div style={{ position: 'relative', marginLeft: '16px' }}>
-                    <select value={activeMonth} onChange={e => setActiveMonth(e.target.value)} style={{ padding: '8px 36px 8px 16px', borderRadius: '12px', border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text-main)', fontSize: '0.9em', fontWeight: 500, cursor: 'pointer', appearance: 'none', outline: 'none' }}>
-                        {allMonths.map(mStr => {
-                            const [my, mm] = mStr.split('-');
-                            return <option key={mStr} value={mStr}>{MONTH_NAMES[parseInt(mm)-1]} {my}</option>;
-                        })}
-                    </select>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
-                <div style={{ marginLeft: 'auto', fontSize: '0.85em', color: 'var(--text-muted)' }}>
-                    {monthTasks.length} task{monthTasks.length !== 1 ? 's' : ''} this month
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginLeft: 'auto' }}>
+                    {/* Month Navigator with Prev / Next and Dropdown */}
+                    <div style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        background: isLight ? '#f1f5f9' : 'rgba(255, 255, 255, 0.06)',
+                        border: `1px solid ${isLight ? '#cbd5e1' : 'rgba(255, 255, 255, 0.15)'}`,
+                        borderRadius: '12px',
+                        padding: '2px',
+                        flexShrink: 0
+                    }}>
+                        <button
+                            type="button"
+                            onClick={handlePrevMonth}
+                            title="Previous Month"
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: isLight ? '#334155' : '#cbd5e1',
+                                cursor: 'pointer',
+                                padding: '6px 9px',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '0.85em',
+                                fontWeight: 800,
+                                transition: 'background 0.15s'
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.background = isLight ? '#e2e8f0' : 'rgba(255,255,255,0.1)'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                        >
+                            ◀
+                        </button>
+
+                        <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+                            <select
+                                value={activeMonth}
+                                onChange={e => setActiveMonth(e.target.value)}
+                                style={{
+                                    padding: '7px 32px 7px 12px',
+                                    borderRadius: '8px',
+                                    border: 'none',
+                                    background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.7)',
+                                    color: isLight ? '#0f172a' : '#f8fafc',
+                                    fontSize: '0.92em',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                    appearance: 'none',
+                                    WebkitAppearance: 'none',
+                                    outline: 'none',
+                                    minWidth: '150px',
+                                    boxShadow: isLight ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+                                    textAlign: 'center'
+                                }}
+                            >
+                                {allMonths.map(mStr => {
+                                    const [my, mm] = mStr.split('-');
+                                    const mName = MONTH_NAMES[parseInt(mm)-1];
+                                    return (
+                                        <option
+                                            key={mStr}
+                                            value={mStr}
+                                            style={{
+                                                background: isLight ? '#ffffff' : '#1e293b',
+                                                color: isLight ? '#0f172a' : '#f8fafc',
+                                                fontWeight: 600,
+                                                padding: '6px'
+                                            }}
+                                        >
+                                            {mName} {my}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                            <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke={isLight ? '#475569' : '#94a3b8'}
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
+                            >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={handleNextMonth}
+                            title="Next Month"
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: isLight ? '#334155' : '#cbd5e1',
+                                cursor: 'pointer',
+                                padding: '6px 9px',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '0.85em',
+                                fontWeight: 800,
+                                transition: 'background 0.15s'
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.background = isLight ? '#e2e8f0' : 'rgba(255,255,255,0.1)'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                        >
+                            ▶
+                        </button>
+                    </div>
+
+                    <div style={{ fontSize: '0.85em', color: 'var(--text-muted)', fontWeight: 600, padding: '4px 8px' }}>
+                        {monthTasks.length} task{monthTasks.length !== 1 ? 's' : ''}
+                    </div>
                 </div>
             </div>
 
