@@ -36,11 +36,39 @@ export default function Dashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch('/api/auth').then(r=>r.json()).then(d=>{
-      if(!d.authenticated) router.push('/worker/login');
-      else if(d.user.role !== 'worker') router.push('/');
-      else { setUser(d.user); setLoading(false); }
-    });
+    let cancelled = false;
+    fetch('/api/auth', { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => {
+        if (cancelled) return;
+        if (!d.authenticated) {
+          router.push('/worker/login');
+        } else if (d.user.role !== 'worker' && d.user.role !== 'admin') {
+          router.push('/');
+        } else {
+          setUser(d.user);
+          setLoading(false);
+        }
+      })
+      .catch(err => {
+        if (cancelled) return;
+        console.error('Worker auth check error:', err);
+        if (typeof window !== 'undefined') {
+          const saved = sessionStorage.getItem('feenix_user');
+          if (saved) {
+            try {
+              const u = JSON.parse(saved);
+              if (u && (u.role === 'worker' || u.role === 'admin')) {
+                setUser(u);
+                setLoading(false);
+                return;
+              }
+            } catch (e) {}
+          }
+        }
+        router.push('/worker/login');
+      });
+    return () => { cancelled = true; };
   }, [router]);
 
   if(loading) return <div style={{textAlign:'center', marginTop:'100px'}}>Establishing Secure Connection...</div>;
