@@ -177,47 +177,68 @@ function AdminDashboard({ router, user }) {
     };
 
     const handleApproveWorkerRegistration = async (workerId) => {
-        const res = await fetch('/api/adminData', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'approveWorker', workerId })
-        });
-        const d = await res.json();
-        if (d.success) {
-            alert(d.message);
+        // Optimistic UI update so the registration disappears from pending and shows active immediately
+        setWorkers(prev => prev.map(w => w.id === workerId ? { ...w, status: 'Approved' } : w));
+        try {
+            const res = await fetch('/api/adminData', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'approveWorker', workerId })
+            });
+            const d = await res.json();
+            if (d.success) {
+                alert(d.message || 'Member registration approved successfully! Access granted.');
+            } else {
+                alert(d.error || 'Approval failed');
+            }
+        } catch (err) {
+            console.error('Approve worker error:', err);
+            alert('Approval failed due to a network or server error.');
+        } finally {
             fetchData();
-        } else {
-            alert(d.error || 'Approval failed');
         }
     };
 
     const handleToggleWorkerStatus = async (workerId) => {
-        const res = await fetch('/api/adminData', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'toggleWorkerStatus', workerId })
-        });
-        const d = await res.json();
-        if (d.success) {
+        setWorkers(prev => prev.map(w => w.id === workerId ? { ...w, status: w.status === 'Approved' ? 'Pending Approval' : 'Approved' } : w));
+        try {
+            const res = await fetch('/api/adminData', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'toggleWorkerStatus', workerId })
+            });
+            const d = await res.json();
+            if (!d.success) {
+                alert(d.error || 'Status toggle failed');
+            }
+        } catch (err) {
+            console.error('Toggle status error:', err);
+            alert('Status toggle failed due to network or server error.');
+        } finally {
             fetchData();
-        } else {
-            alert(d.error || 'Status toggle failed');
         }
     };
 
     const handleRejectWorkerRegistration = async (workerId, name) => {
         if (!confirm(`Are you sure you want to reject the registration request for ${name}?`)) return;
-        const res = await fetch('/api/adminData', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'rejectWorker', workerId })
-        });
-        const d = await res.json();
-        if (d.success) {
-            alert(d.message);
+        setWorkers(prev => prev.filter(w => w.id !== workerId));
+        try {
+            const res = await fetch('/api/adminData', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'rejectWorker', workerId })
+            });
+            const d = await res.json();
+            if (d.success) {
+                alert(d.message || 'Registration request rejected and account removed.');
+            } else {
+                alert(d.error || 'Rejection failed');
+            }
+        } catch (err) {
+            console.error('Reject worker error:', err);
+            alert('Rejection failed due to network or server error.');
+        } finally {
             fetchData();
-        } else {
-            alert(d.error || 'Rejection failed');
         }
     };
 
