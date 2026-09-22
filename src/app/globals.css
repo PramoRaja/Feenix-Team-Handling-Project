@@ -1164,10 +1164,8 @@ body.dark-mode .network-scroll-container::-webkit-scrollbar-track {
   gap: 8px;
   padding: 6px;
   border-radius: 14px;
-  width: 100%;
+  width: fit-content;
   max-width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
   margin-bottom: 20px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
